@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading;
-
-namespace Tank
+﻿namespace Tank
 {
     internal class CollisionManager
     {
@@ -21,53 +18,62 @@ namespace Tank
             this.M= M; 
         }
 
-        public void CollisionForTank()
+        private void CollisionForTank(Tank T)
         {
 
             foreach (var S in M.M)
             {
-                if(T1.IsTouchingBottom(S) || T1.IsTouchingTop(S) || T1.IsTouchingLeft(S) || T1.IsTouchingRight(S))
+                if(T.IsTouchingBottom(S) || T1.IsTouchingTop(S) || T.IsTouchingLeft(S) || T.IsTouchingRight(S))
                 {
-                    T1.position -= T1.velocity * Globals.TotalSeconds;
+                    T.position -= T.velocity * Globals.TotalSeconds;
                     break;
                 }
-                
             }
-            if(T1.position.X<0 || T1.position.X+T1.width> Globals.Window.ClientBounds.Width || T1.position.Y<0 || T1.position.Y+T1.height>Globals.Window.ClientBounds.Height)
+            if(T.position.X<0 || T.position.X+T1.width> Globals.Window.ClientBounds.Width || T.position.Y<0 || T.position.Y+T.height>Globals.Window.ClientBounds.Height)
             {
-                T1.position -= T1.velocity * Globals.TotalSeconds;
+                T.position -= T.velocity * Globals.TotalSeconds;
             }
-            CollisionForBullet(T1.bullet);
-            T1.Update();
-        }
-        public void CollisionForBullet(Bullet b)
-        {
-           
-            
-            foreach(var S in M.M)
+            foreach (var S in M.M)
             {
 
-                if(S.body.Intersects(b.body))
+                if (S.body.Intersects(T.bullet.body))
                 {
-                    b.exp.position = b.position;
-                    b.exp.Start();
-                    b.exp.Reset();
-                    T1.bullet.velocity = Vector2.Zero;
+                    T.bullet.exp.position = T.bullet.position;
+                    T.bullet.exp.Start();
+                    T.bullet.exp.Reset();
+                    T.bullet.velocity = Vector2.Zero;
                     S.position = new Vector2(-8, 0);
-                    
+                    M.Update();
                     //break;
                 }
-                
+
             }
-            if(b.position.X < 0 || b.position.X+b.width>Globals.Window.ClientBounds.Width || b.position.Y<0 || b.position.Y+b.height>Globals.Window.ClientBounds.Height)
+            if (T.bullet.position.X < 0 || T.bullet.position.X + T.bullet.width > Globals.Window.ClientBounds.Width || T.bullet.position.Y < 0 || T.bullet.position.Y + T.bullet.height > Globals.Window.ClientBounds.Height)
             {
-                
-                b.exp.position = b.position;
-                b.exp.Start();
-                b.velocity= Vector2.Zero;
-                
+                T.bullet.exp.position = T.bullet.position;
+                T.bullet.exp.Start();
+                T.bullet.velocity = Vector2.Zero;
             }
-            
+            T.Update();
+        }
+
+        public void CollisionForTanks()
+        {
+            CollisionForTank(T1);
+            CollisionForTank(T2);
+            if(T1.bullet.body.Intersects(T2.bullet.body) && T1.bullet.velocity != Vector2.Zero && T2.bullet.velocity != Vector2.Zero)
+            {
+                T1.bullet.velocity = Vector2.Zero;
+                T1.bullet.exp.position = T1.bullet.position;
+                T1.bullet.exp.Reset();
+                T1.bullet.exp.Start();
+                
+                T2.bullet.velocity = Vector2.Zero;
+                T2.bullet.exp.position = T2.bullet.position;
+                T2.bullet.exp.Reset();
+                T2.bullet.exp.Start();
+            }
+           
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Tank
 {
     public class Game1 : Game
@@ -7,7 +9,7 @@ namespace Tank
         private SpriteBatch _spriteBatch;
         private SpriteFont font;
         private Tank T1;
-        
+        private Tank T2;
         private Map M;
         CollisionManager collisionManager;
         public Game1()
@@ -33,10 +35,20 @@ namespace Tank
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Globals.SpriteBatch = _spriteBatch;
             font = Globals.Content.Load<SpriteFont>("File");
-            T1 = new Tank(Globals.Content.Load<Texture2D>("Tank1"), 32, 32);
-            
+            T1 = new Tank(Globals.Content.Load<Texture2D>("Tank1"), 8*32, 32,
+                Keys.A,
+                Keys.D,
+                Keys.W,
+                Keys.S,
+                Keys.F);
+            T2 = new Tank(Globals.Content.Load<Texture2D>("Tank2"), 8 * 32, 16 * 32,
+                Keys.Left,
+                Keys.Right,
+                Keys.Up,
+                Keys.Down,
+                Keys.NumPad0);
             M = new Map();
-            collisionManager = new CollisionManager(T1, M);
+            collisionManager = new CollisionManager(T1,T2, M);
             // TODO: use this.Content to load your game content here
         }
 
@@ -47,9 +59,7 @@ namespace Tank
             
             // TODO: Add your update logic here
             Globals.Update(gameTime);
-            collisionManager.CollisionForTank();
-            
-            M.Update();
+            collisionManager.CollisionForTanks();
             base.Update(gameTime);
         }
 
@@ -61,6 +71,7 @@ namespace Tank
             _spriteBatch.Begin();
             M.Draw();
             T1.Draw();
+            T2.Draw();
             _spriteBatch.DrawString(font, T1.body.ToString(), Vector2.Zero, Color.White);
             _spriteBatch.DrawString(font, T1.bullet.body.ToString(), new Vector2(0, 40), Color.White);
             _spriteBatch.End();
